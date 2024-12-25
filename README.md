@@ -15,7 +15,7 @@ A Blender addon for managing camera-aligned image planes with intuitive distance
 
 ## Installation
 
-1. Download the latest release (`camera_plane_manager.py`)
+1. Download the latest release (`camera-plane-manager-addon.py`)
 2. Open Blender and go to Edit > Preferences
 3. Click on the "Add-ons" section
 4. Click "Install..." and select the downloaded file
