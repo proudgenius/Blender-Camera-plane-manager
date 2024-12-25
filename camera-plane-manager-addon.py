@@ -1,12 +1,12 @@
 bl_info = {
     "name": "Camera Plane Manager",
     "author": "Cristian Omar Jimenez",
-    "version": (1, 0, 0),
+    "version": (1, 1, 0),
     "blender": (4, 0, 0),
     "location": "Properties > Object > Camera Plane",
     "description": "Import and manage camera-aligned image planes with distance controls",
     "warning": "",
-    "doc_url": "",
+    "doc_url": "https://github.com/proudgenius/Blender-Camera-plane-manager",
     "category": "Camera",
 }
 
@@ -262,11 +262,14 @@ class CAMERA_OT_Add_Empty_Control(bpy.types.Operator):
 
         # Create empty
         empty = bpy.data.objects.new(f"{plane.name}_distance", None)
-        empty.empty_display_type = 'PLAIN_AXES'  # Changed to plain axes for better visibility
+        empty.empty_display_type = 'PLAIN_AXES'
         empty.empty_display_size = 0.5
 
-        # Place empty at camera's current location
-        empty.location = cam.matrix_world.translation.copy()
+        # Get the camera's world position accounting for full hierarchy
+        cam_world_pos = cam.matrix_world.translation.copy()
+        
+        # Place empty at camera's world position
+        empty.location = cam_world_pos
         
         # Link empty to same collections as camera
         for coll in cam.users_collection:
@@ -279,14 +282,14 @@ class CAMERA_OT_Add_Empty_Control(bpy.types.Operator):
         driver = plane.driver_add('["camera_plane_distance"]')
         driver.driver.type = 'SCRIPTED'
         
-        # Add camera location variable
+        # Get full camera world matrix
         var = driver.driver.variables.new()
-        var.name = "cam_loc"
+        var.name = "cam_mat"
         var.type = 'TRANSFORMS'
         var.targets[0].id = cam
         var.targets[0].transform_type = 'LOC_Y'
         var.targets[0].transform_space = 'WORLD_SPACE'
-        
+
         # Add empty location variable
         var = driver.driver.variables.new()
         var.name = "empty_loc"
@@ -294,9 +297,20 @@ class CAMERA_OT_Add_Empty_Control(bpy.types.Operator):
         var.targets[0].id = empty
         var.targets[0].transform_type = 'LOC_Y'
         var.targets[0].transform_space = 'WORLD_SPACE'
+
+        # Add camera scale variable
+        var = driver.driver.variables.new()
+        var.name = "cam_scale"
+        var.type = 'TRANSFORMS'
+        var.targets[0].id = cam
+        var.targets[0].transform_type = 'SCALE_Y'
+        var.targets[0].transform_space = 'WORLD_SPACE'
         
-        # Expression calculates distance between camera and empty
-        driver.driver.expression = "abs(empty_loc - cam_loc)"
+        # Expression accounts for camera scale when calculating distance
+        driver.driver.expression = "abs(empty_loc - cam_mat) * (1/cam_scale)"
+        
+        # Move empty to achieve initial distance, accounting for camera scale
+        empty.location.y = cam_world_pos.y + (plane["camera_plane_distance"] * cam.scale.y)
 
         return {'FINISHED'}
 
