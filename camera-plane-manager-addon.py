@@ -340,7 +340,7 @@ class CAMERA_OT_Remove_Empty_Control(bpy.types.Operator):
 
 class CAMERA_PT_Simple_Camera_Plane(bpy.types.Panel):
     """Panel for camera plane operations"""
-    bl_label = "Camera Plane"
+    bl_label = "Camera Plane Manager"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = "object"
