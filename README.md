@@ -2,6 +2,12 @@
 
 A Blender addon for managing camera-aligned image planes with intuitive distance controls.
 
+
+
+https://github.com/user-attachments/assets/0b38f481-8dd6-446e-9e11-f09d8afa6403
+
+
+
 ## Features
 
 - Import images as planes that automatically align with cameras
